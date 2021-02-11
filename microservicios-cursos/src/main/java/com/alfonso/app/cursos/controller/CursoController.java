@@ -15,6 +15,7 @@ import com.alfonso.app.cursos.models.entity.Curso;
 import com.alfonso.app.cursos.services.ICursoService;
 import com.alfonso.commons.alumnos.models.entity.Alumno;
 import com.alfonso.commons.controller.CommonController;
+import com.alfonso.commons.examenes.models.entity.Examen;
 
 @RestController
 public class CursoController extends CommonController<Curso, ICursoService> {
@@ -63,5 +64,33 @@ public class CursoController extends CommonController<Curso, ICursoService> {
 	public ResponseEntity<?> buscarCursoXAlumnoId(@PathVariable Long id){
 		Curso curso = entityService.findCursoByAlumnoId(id);
 		return ResponseEntity.ok(curso);
+	}
+	
+	//metodo que añade examen al curso
+	@PutMapping("/{id}/asignar-examen")
+	public ResponseEntity<?> asignarExamen(@RequestBody List<Examen> examenes, @PathVariable Long id){
+		Optional<Curso> opt = this.entityService.BuscarXId(id);
+		if(!opt.isPresent()) {
+			return ResponseEntity.noContent().build();
+		}
+		Curso cursodb = opt.get();
+		examenes.forEach(examen -> {
+			cursodb.addExamen(examen);
+		});
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.entityService.guardar(cursodb));
+	}
+	
+	//metodo que elimina un examen del curso
+	@PutMapping("/{id}/eliminar-examen")
+	public ResponseEntity<?> eliminarExamen(@RequestBody Examen examen, @PathVariable Long id){
+		Optional<Curso> opt = this.entityService.BuscarXId(id);
+		if(!opt.isPresent()) {
+			return ResponseEntity.noContent().build();
+		}
+		Curso cursodb = opt.get();
+		cursodb.removeExamen(examen);
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(this.entityService.guardar(cursodb));
 	}
 }

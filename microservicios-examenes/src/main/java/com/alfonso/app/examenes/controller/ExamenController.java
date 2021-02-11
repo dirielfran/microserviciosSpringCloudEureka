@@ -6,13 +6,14 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alfonso.app.examenes.models.entity.Examen;
-import com.alfonso.app.examenes.models.entity.Pregunta;
+import com.alfonso.commons.examenes.models.entity.Examen;
+import com.alfonso.commons.examenes.models.entity.Pregunta;
 import com.alfonso.app.examenes.service.IExamenService;
 import com.alfonso.commons.controller.CommonController;
 
@@ -51,6 +52,16 @@ public class ExamenController extends CommonController<Examen, IExamenService> {
 		examenbd.setPreguntas(examen.getPreguntas());
 	
 		return ResponseEntity.status(HttpStatus.CREATED).body(entityService.guardar(examenbd));
+	}
+	
+	@GetMapping("/filtrar/{term}")
+	public ResponseEntity<?> filtrarExamen(@PathVariable String term){
+		return ResponseEntity.ok(entityService.findByNombre(term));
+	}
+	
+	@GetMapping("asignaturas")
+	public ResponseEntity<?> getAsignaturas(){
+		return ResponseEntity.ok(entityService.findAllAsignatura());
 	}
 
 }
