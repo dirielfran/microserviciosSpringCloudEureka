@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alfonso.commons.examenes.models.entity.Asignatura;
-import com.alfonso.commons.examenes.models.entity.Examen;
 import com.alfonso.app.examenes.models.repository.IAsignaturaRepository;
 import com.alfonso.app.examenes.models.repository.IExamenRepository;
+import com.alfonso.commons.examenes.models.entity.Asignatura;
+import com.alfonso.commons.examenes.models.entity.Examen;
 import com.alfonso.commons.services.CommonServiceImpl;
 
 @Service

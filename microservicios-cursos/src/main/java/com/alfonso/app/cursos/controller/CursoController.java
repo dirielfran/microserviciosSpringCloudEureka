@@ -2,9 +2,13 @@ package com.alfonso.app.cursos.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,12 +20,17 @@ import com.alfonso.app.cursos.services.ICursoService;
 import com.alfonso.commons.alumnos.models.entity.Alumno;
 import com.alfonso.commons.controller.CommonController;
 import com.alfonso.commons.examenes.models.entity.Examen;
+//import com.alfonso.commons.examenes.models.entity.Examen;
 
 @RestController
 public class CursoController extends CommonController<Curso, ICursoService> {
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<?> editarCurso(@RequestBody Curso curso, @PathVariable Long id){
+	public ResponseEntity<?> editarCurso(@Valid @RequestBody Curso curso, BindingResult result, @PathVariable Long id){
+		
+		// Validacion de campos
+		if(result.hasErrors()) return this.validar(result);
+		
 		Optional<Curso> opt = this.entityService.BuscarXId(id);
 		if(!opt.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -63,11 +72,22 @@ public class CursoController extends CommonController<Curso, ICursoService> {
 	@GetMapping("/alumno/{id}")
 	public ResponseEntity<?> buscarCursoXAlumnoId(@PathVariable Long id){
 		Curso curso = entityService.findCursoByAlumnoId(id);
+		if( null != curso) {
+			List<Long> examenesIds = (List<Long>) entityService.getExamenesIdsRespondidos(id);
+			
+			List<Examen> examenes = curso.getExamenes().stream().map( examen -> {
+				if( examenesIds.contains(examen.getId())) {
+					examen.setRespondido(true);
+				}
+				return examen;
+			}).collect(Collectors.toList());
+			curso.setExamenes(examenes);
+		}
 		return ResponseEntity.ok(curso);
 	}
 	
 	//metodo que añade examen al curso
-	@PutMapping("/{id}/asignar-examen")
+	@PutMapping("/{id}/asignar-examenes")
 	public ResponseEntity<?> asignarExamen(@RequestBody List<Examen> examenes, @PathVariable Long id){
 		Optional<Curso> opt = this.entityService.BuscarXId(id);
 		if(!opt.isPresent()) {

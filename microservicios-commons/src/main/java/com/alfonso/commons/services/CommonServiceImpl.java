@@ -3,13 +3,14 @@ package com.alfonso.commons.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 
 //Se modifica para que la implementacion sea generica, R es cualquier tipo que extienda de CrudRepository
-public class CommonServiceImpl<E, R extends CrudRepository<E,Long>> implements ICommonService<E> {
+public class CommonServiceImpl<E, R extends PagingAndSortingRepository<E,Long>> implements ICommonService<E> {
 	
 	@Autowired
 	//Se modifica metodo de acceso para que puedan ser utilizadas por las clases hijas
@@ -37,5 +38,11 @@ public class CommonServiceImpl<E, R extends CrudRepository<E,Long>> implements I
 	@Transactional
 	public void deleteById(Long idEntity) {
 		entityRepo.deleteById(idEntity);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<E> buscarTodos(Pageable pageable) {
+		return entityRepo.findAll(pageable);
 	}
 }

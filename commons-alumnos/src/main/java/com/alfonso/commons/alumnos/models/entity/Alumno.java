@@ -11,6 +11,11 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Lob;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "alumnos")
@@ -20,13 +25,27 @@ public class Alumno {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotEmpty
 	private String nombre;
+	
+	@NotEmpty
 	private String apellido;
+	
+	@NotEmpty
+	@Email
 	private String email;
 	
 	@Column(name = "create_at")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createAt;
+	
+	@Lob
+	@JsonIgnore
+	private byte[] foto;
+	
+	public Integer getFotoHshCode() {
+		return ( this.foto != null ) ? this.foto.hashCode() : null;
+	}
 	
 	@PrePersist
 	public void prePersist() {
@@ -75,6 +94,14 @@ public class Alumno {
 	
 	
 	
+	public byte[] getFoto() {
+		return foto;
+	}
+
+	public void setFoto(byte[] foto) {
+		this.foto = foto;
+	}
+
 	@Override
 	//Se sobreescribe el metodo equeal para la comparacion de objetos en el metodo remove de Curso
 	public boolean equals(Object obj) {
